@@ -1,8 +1,9 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {MicrobitService} from './microbit.service';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-import {Subject} from 'rxjs';
-import {takeUntil} from 'rxjs/operators';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { BpmDetectorService } from './bpm-detector.service';
+import { MicrobitService } from './microbit.service';
 
 @Component({
   selector: 'app-microbit',
@@ -12,19 +13,28 @@ import {takeUntil} from 'rxjs/operators';
 export class MicrobitComponent implements OnInit, OnDestroy {
 
   public formKeys = {
-    speed: 'speed'
+    bpm: 'bpm'
   };
 
   public formGroup: FormGroup;
-  public get speed(): FormControl { return this.formGroup ? this.formGroup.get(this.formKeys.speed) as FormControl : null; }
+  public get bpm(): FormControl { return this.formGroup ? this.formGroup.get(this.formKeys.bpm) as FormControl : null; }
 
   private componentDestroyed$ = new Subject<void>();
 
   constructor(private formBuilder: FormBuilder,
+              public bpmService: BpmDetectorService,
               public microbitService: MicrobitService) { }
 
   ngOnInit(): void {
     this.setupForm();
+
+    this.bpmService.bpm$
+      .pipe(
+        takeUntil(this.componentDestroyed$)
+      )
+      .subscribe(
+        bpm => this.bpm.setValue(bpm)
+      );
   }
 
   ngOnDestroy(): void {
@@ -34,7 +44,7 @@ export class MicrobitComponent implements OnInit, OnDestroy {
 
   private setupForm(): void {
     this.formGroup = this.formBuilder.group({
-      [ this.formKeys.speed ]: [ 100, [Validators.required] ]
+      [ this.formKeys.bpm ]: [ 100, [Validators.required] ]
     });
 
     this.formGroup.valueChanges
@@ -48,12 +58,23 @@ export class MicrobitComponent implements OnInit, OnDestroy {
 
   }
 
+  public tap(): void {
+    this.bpmService.registerBeat();
+  }
+
   public connect(): void {
     this.microbitService.connect();
   }
 
   public sendFormData(): void {
-    this.microbitService.sendMessage(this.speed.value);
+    const delayTime = this.bpmToDelayConverter(this.bpm.value);
+    this.microbitService.sendMessage(delayTime.toString());
+  }
+
+  private bpmToDelayConverter(bpm: number): number {
+    const targetFlashesPerSecond = bpm / 60;
+    const targetOnOffCyclesPerSecond = targetFlashesPerSecond * 2;
+    return Math.floor(1000 / targetOnOffCyclesPerSecond);
   }
 
 }

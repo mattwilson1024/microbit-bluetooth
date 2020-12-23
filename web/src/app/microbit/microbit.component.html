@@ -11,16 +11,26 @@
       [formGroup]="formGroup"
       (ngSubmit)="onFormSubmit()">
 
-  <label>Speed</label>
-  <mat-slider
-    class="slider"
-    label="Speed"
-    [formControl]="speed"
-    [invert]="true"
-    [max]="1000"
-    [min]="5"
-    [step]="1">
-  </mat-slider>
-  <label>(Gap time: {{speed.value}}ms)</label>
+  <section>
+    <h3>Speed</h3>
+    <mat-slider
+      class="slider"
+      label="Speed"
+      [formControl]="bpm"
+      [max]="300"
+      [min]="30"
+      [step]="1">
+    </mat-slider>
+    <label>{{bpm.value}} BPM</label>
+  </section>
+
+  <section>
+    <h3>Tap 8 beats</h3>
+    <button mat-raised-button
+            color="primary"
+            (click)="tap()">
+      Tap ({{ bpmService.nextBeatNumber$ | async }})
+    </button>
+  </section>
 
 </form>

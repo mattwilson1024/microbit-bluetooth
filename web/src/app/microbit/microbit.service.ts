@@ -1,7 +1,7 @@
 /// <reference types="web-bluetooth" />
 
-import {Injectable} from '@angular/core';
-import {BehaviorSubject} from 'rxjs';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -43,7 +43,9 @@ export class MicrobitService {
   }
 
   public async sendMessage(message: string): Promise<void> {
-    const encodedMessage = this.textEncoder.encode(`${message}:`);
-    await this.uartRxCharacteristic.writeValue(encodedMessage);
+    if (this.isConnected$.value) {
+      const encodedMessage = this.textEncoder.encode(`${message}:`);
+      await this.uartRxCharacteristic.writeValue(encodedMessage);
+    }
   }
 }
