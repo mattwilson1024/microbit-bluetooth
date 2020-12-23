@@ -1,0 +1,26 @@
+<h1>Micro:bit</h1>
+
+<button *ngIf="!(microbitService.isConnected$ | async)"
+        mat-raised-button
+        color="primary"
+        (click)="connect()">
+  Connect
+</button>
+
+<form *ngIf="microbitService.isConnected$ | async"
+      [formGroup]="formGroup"
+      (ngSubmit)="onFormSubmit()">
+
+  <label>Speed</label>
+  <mat-slider
+    class="slider"
+    label="Speed"
+    [formControl]="speed"
+    [invert]="true"
+    [max]="1000"
+    [min]="5"
+    [step]="1">
+  </mat-slider>
+  <label>(Gap time: {{speed.value}}ms)</label>
+
+</form>
