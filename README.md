@@ -24,7 +24,11 @@ This is an example of communicating via bluetooth between a web app and a BBC mi
 
 ## Run the web app
 
-This repo contains an example web app built with Angular. In `src/microbit` there is a component which shows a simple form containing a slider to change the speed of the flashing LEDs. The most interesting part is `src/app/microbit/microbit.service.ts` which uses the Web Bluetooth API to connect to the micro:bit and send messages.
+This repo contains an example web app built with Angular. 
+
+The interesting part lives in `src/microbit` - this includes a component allowing the user to select a BPM either by dragging a slider or tapping a button 8 times (2 bars) in time with the music. This BPM will be used to set the speed at which the LEDs flash.
+
+The `src/app/microbit/microbit.service.ts` file uses the Web Bluetooth API to connect to the micro:bit and send a message each time the BPM is updated.
 
 1. Install Node and Yarn
 2. In the `web` directory, run the following to install dependencies and start the app
@@ -34,4 +38,4 @@ This repo contains an example web app built with Angular. In `src/microbit` ther
    ```
 3. Go to http://localhost:4200/
 4. Click the `Connect` button and select the microbit in the device pairing pop up. On the Microbit LED display you should see a tick to signify that the connection is active. The LEDs should start to flash.
-5. Move the slider to change the speed. This transmits a bluetooth message for example `400:` for 400ms delay between on/off states. The microbit reads until it sees a `:` character, parses the number to an int and sets the flash speed.
+5. Move the slider or press the "Tap" button 8 times in a row to change the speed. This transmits a bluetooth message for example `400:` for 400ms delay between on/off states. The microbit reads until it sees a `:` character, parses the number to an int and sets the flash speed.
